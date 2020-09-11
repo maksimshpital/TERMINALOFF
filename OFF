@@ -1,0 +1,47 @@
+#include <iostream>
+#include <cmath>
+
+int main() {
+
+double a{}, b{}, n{};
+double const pi{3.141592};
+
+std::cout « "ReZ = ";
+std::cin » a;
+std::cout « "\nImZ = ";
+std::cin » b;
+std::cout « "\nn =";
+std::cin » n;
+
+//Пункт 1.
+
+double absZ{sqrt(a*a + b*b)}, argZ{};
+
+if (a > 0) {
+argZ = atan(b / a);
+} else if (a < 0) {
+if (b >= 0)
+argZ = atan(b / a) + pi;
+else argZ = atan(b / a) - pi;
+} else if (a = 0) {
+b > 0 ? argZ = pi / 2 : argZ = -pi / 2;
+}
+
+std::cout « std::endl « "1) Z = " « absZ « " * (cos(" « argZ « ") + i * sin(" « argZ « "))" « std::endl;
+
+//Пункт 2.
+std::cout « "2) Z^(-1) = " « a / (a*a + b*b) « std::showpos « -b / (a*a + b*b) « "*i" « std::endl;
+
+//Пункт 3
+std::cout « "3) Z^" « n « " = "
+« std::showpos « pow(absZ, n)*cos(argZ * n) « pow(absZ, n)*sin(argZ * n) « "*i" « std::endl;
+
+// Пункт 4
+std::cout « "4) Z^(1/" « n « "):" « std::endl;
+
+for (size_t i{}; i < n; i++) {
+std::cout « "z" « i « " = " « std::showpos « pow(absZ, 1/n) * cos((argZ + 2*pi*i) / n)
+« pow(absZ, 1/n) * sin((argZ + 2*pi*i) / n) « "*i" « std::endl;
+}
+return 0;
+}
