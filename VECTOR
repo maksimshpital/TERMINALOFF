@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+} vect;
+
+// векторное произведение векторов
+vect vect_mul (vect a, vect b)
+{
+    vect res;
+    res.x = a.y * b.z - a.z * b.y;
+    res.y = a.z * b.x - a.x * b.z;
+    res.z = a.x * b.y - a.y * b.x;
+    return res;
+}
+
+// скалярное произведение векторов
+float scalar_mul (vect a, vect b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+// печать вектора на экран
+void putv (vect v)
+{
+    printf ("%f,%f,%f;", v.x, v.y, v.z);
+}
+
+float vector_zero (vect v)
+{
+    return v.x + v.y + v.z;
+}
+
+// ввод вектора с клавиатуры
+vect getv()
+{
+    vect result = {0, 0, 0};
+    char str[20];
+
+    printf ("%s", "x: ");
+    if (gets(str) != NULL)
+        result.x = atof(str);
+
+    printf ("%s", "y: ");
+    if (gets(str) != NULL)
+        result.y = atof(str);
+
+    printf ("%s", "z: ");
+    if (gets(str) != NULL)
+        result.z = atof(str);
+
+    return result;
+}
+
+
+
+int main()
+{
+    vect a, b, c, d;
+    float scalar;
+    puts ("Enter vector A");
+    a = getv();
+
+    puts ("Enter vector B");
+    b = getv();
+
+    puts ("Enter vector C");
+    c = getv();
+
+    // если векторы компланарны, то их смешанное произведение будет равно 0
+    d = vect_mul(a, b);
+    scalar = scalar_mul(d, c);
+    if (scalar == 0.0)
+        puts ("Vectors are coplanar");
+    else
+        puts ("Vectors are not coplanar");
+
+    // если векторы коллинеарны, то их векторное произведение равно нулевому вектору
+    if ((vector_zero(vect_mul(a, b)) == 0.0) && (vector_zero(vect_mul(a, c))) == 0.0) puts ("A, B, C collinear");
+    else if (vector_zero(vect_mul(a, b)) == 0.0) puts ("A, B collinear");
+    else if (vector_zero(vect_mul(a, c)) == 0.0) puts ("A, C collinear");
+    else if (vector_zero(vect_mul(b, c)) == 0.0) puts ("B, C collinear");
+    else puts ("No collinear vectors");
+
+    return 0;
+}
