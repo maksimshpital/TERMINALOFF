@@ -1,74 +1,110 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#pragma warning(disable:4996)
+#include <stdbool.h>
 
-int main() {
-  int n, k;
-  printf("Введите размерность: \n");
-  scanf("%d", &n);
-  printf("Введите число векторов: \n");
-  scanf("%d", &k);
-  double** a = NULL;
 
-  a = (double**)malloc(n * sizeof(double *));
-  for (int i = 0; i < n; i++) {
-    a[i] = (double*)malloc(k * sizeof(double));
-  }
-
-  printf("Введите координаты векторов: \n");
-  for (int i = 0; i < k; i++)
-    for (int p = 0; p < n; p++) {
-      float l;
-      scanf("%f", &l);
-      a[p][i] = l;
+void display(float** mat, int row, int col)
+{
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+            printf("  %f", mat[i][j]);
+        printf("\n");
     }
+}
+void swap(float** mat, int row1, int row2,
+    int col)
+{
+    for (int i = 0; i < col; i++)
+    {
+        int temp = mat[row1][i];
+        mat[row1][i] = mat[row2][i];
+        mat[row2][i] = temp;
+    }
+}
 
-  for (int i = 0; i < k; i++) {
-    for (int p = i; p < n; p++) {
-      if (fabs(a[p][i]) < pow(10, -15)) {
-        for (int tt = i; tt < k; tt++) {
-          if (a[p][tt] != 0) {
-            for (int u = 0; u < n; u++) {
-              double m = a[u][i];
-              a[u][i] = a[u][tt];
-              a[u][tt] = m;
+int calculateRank(float** mat, int rows, int cols)
+{
+    int rank = cols;
+
+    for (int row = 0; row < rank; row++)
+    {
+ 
+        if (row < cols && row < rows && mat[row][row] != 0)
+        {
+            for (int col = 0; col < rows; col++)
+            {
+                if (col != row)
+                {
+                    float mult = mat[col][row] /
+                        mat[row][row];
+                    for (int i = 0; i < rank; i++)
+                        mat[col][i] -= mult * mat[row][i];
+                }
             }
-            break;
-          }
         }
-      }
+       
+        else
+        {
+            bool reduce = true;
 
-      if (a[p][i] != 0)
-        break;
-    }
-  }
+            for (int i = row + 1; i < rows; i++)
+            {
+                if (mat[i][row] != 0)
+                {
+                    swap(mat,row, i, rank);
+                    reduce = false;
+                    break;
+                }
+            }
 
-  for (int i = 0; i < k - 1; i++) {
-    if (a[i][i] != 0) {
-      for (int tt = i + 1; tt < k; tt++) {
-        double alfa = a[i][tt] / a[i][i];
-        for (int u = 0; u < n; u++) {
-          a[u][tt] = a[u][tt] - a[u][i] * alfa;
+            if (reduce)
+            {
+                rank--;
+
+                for (int i = 0; i < rows; i++)
+                    mat[i][row] = mat[i][rank];
+            }
+
+            row--;
         }
-      }
     }
-  }
-  int r = 0;
-  for (int tt = 0; tt < k; tt++) {
+    return rank;
+}
+int main() {
+    int n, k;
+    printf("Input dimensions: \n");
+    scanf("%d", &n);
+    printf("Input vectors count: \n");
+    scanf("%d", &k);
+    float** a = NULL;
+
+    a = (float**)malloc(n * sizeof(float*));
     for (int i = 0; i < n; i++) {
-      if (a[i][tt] != 0) {
-        r++;
-        break;
-      }
+        a[i] = (float*)malloc(k * sizeof(float));
     }
-  }
 
-  printf("Ранг равен %d \n", r);
+    printf("Input vector coordinates: \n");
+    for (int i = 0; i < k; i++)
+    {
+        printf("Vector %d:\n", i+1);
+        for (int coordinate = 0; coordinate < n; coordinate++) {
+            float l;
+            scanf("%f", &l);
+            a[coordinate][i] = l;
+        }
+    }
+   display(a, n, k);
+	
+   int rank = calculateRank(a, n, k);
+    printf("%d\n", rank);
+	
+    for (int i = 0; i < n; i++) {
+        free(a[i]);
+    }
+    free(a);
 
-  for (int i = 0; i < n; i++) {
-    free(a[i]);
-  }
-  free(a);
-
-  return 0;
+    return 0;
 }
