@@ -1,0 +1,110 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+
+void display(float** mat, int row, int col)
+{
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+            printf("  %f", mat[i][j]);
+        printf("\n");
+    }
+}
+void swap(float** mat, int row1, int row2,
+    int col)
+{
+    for (int i = 0; i < col; i++)
+    {
+        int temp = mat[row1][i];
+        mat[row1][i] = mat[row2][i];
+        mat[row2][i] = temp;
+    }
+}
+
+int calculateRank(float** mat, int rows, int cols)
+{
+    int rank = cols;
+
+    for (int row = 0; row < rank; row++)
+    {
+ 
+        if (row < cols && row < rows && mat[row][row] != 0)
+        {
+            for (int col = 0; col < rows; col++)
+            {
+                if (col != row)
+                {
+                    float mult = mat[col][row] /
+                        mat[row][row];
+                    for (int i = 0; i < rank; i++)
+                        mat[col][i] -= mult * mat[row][i];
+                }
+            }
+        }
+       
+        else
+        {
+            bool reduce = true;
+
+            for (int i = row + 1; i < rows; i++)
+            {
+                if (mat[i][row] != 0)
+                {
+                    swap(mat,row, i, rank);
+                    reduce = false;
+                    break;
+                }
+            }
+
+            if (reduce)
+            {
+                rank--;
+
+                for (int i = 0; i < rows; i++)
+                    mat[i][row] = mat[i][rank];
+            }
+
+            row--;
+        }
+    }
+    return rank;
+}
+int main() {
+    int n, k;
+    printf("Input dimensions: \n");
+    scanf("%d", &n);
+    printf("Input vectors count: \n");
+    scanf("%d", &k);
+    float** a = NULL;
+
+    a = (float**)malloc(n * sizeof(float*));
+    for (int i = 0; i < n; i++) {
+        a[i] = (float*)malloc(k * sizeof(float));
+    }
+
+    printf("Input vector coordinates: \n");
+    for (int i = 0; i < k; i++)
+    {
+        printf("Vector %d:\n", i+1);
+        for (int coordinate = 0; coordinate < n; coordinate++) {
+            float l;
+            scanf("%f", &l);
+            a[coordinate][i] = l;
+        }
+    }
+   display(a, n, k);
+	
+   int rank = calculateRank(a, n, k);
+    printf("%d\n", rank);
+	
+    for (int i = 0; i < n; i++) {
+        free(a[i]);
+    }
+    free(a);
+
+    return 0;
+}
