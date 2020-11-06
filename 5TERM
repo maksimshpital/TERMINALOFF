@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <malloc.h>
+ 
+ 
+  void solve(double **mas, double *answers, int k, int n){
+  	double sum = 0;
+    for (int i = n; i > k; i--){
+    	sum += mas[k][i] * answers[i];
+    	
+    }
+    answers[k] = mas[k][n + 1] - sum;
+  	
+  }
+  void prepare_for_solve(double** arr, int N){
+  	for (int i = 0; i < N; i++){
+  		double value_swap = fabs(arr[i][i]);
+        int line = i;
+        for (int j = i; j < N; j++){
+        	if (fabs(arr[j][i]) > value_swap){
+        		value_swap = fabs(arr[j][i]);
+        		line = j;
+        		
+        	}
+        	
+        }
+        for (int j = 0; j <= N; j++){
+        	double a = arr[i][j];
+            arr[i][j] = arr[line][j];
+            arr[line][j] = a;
+        	
+        }
+        for (int j = i; j < N; j++){
+        	if (arr[j][i] != 0){
+        		double temp = arr[j][i];
+                for (int k = i; k <= N; k++){
+                	arr[j][k] /= temp;
+                	
+                }
+        		
+        	}
+        	
+        }
+        for (int j = i + 1; j < N; j++){
+        	if (arr[j][i] != 0){
+        		for (int k = i; k <= N; k++){
+        			arr[j][k] -= arr[i][k];
+        			
+        		}
+        		
+        	} 
+        	
+        }
+  		
+  	}
+  	
+  }
+     int main(){
+     	int N = 0;
+        scanf("%d", &N);
+        double** arr = (double**)malloc(sizeof(double*) * N);
+        double* result = (double*)malloc(sizeof(double) * N);
+        for (int i = 0; i < N; i++){
+        	arr[i] = (double*)malloc(sizeof(double) * (N + 1));
+        for (int j = 0; j < (N + 1); j++){
+        	scanf("%lf", &arr[i][j]);
+        	
+        }
+        	
+        }
+        prepare_for_solve(arr, N);
+        for (int i = N - 1; i >= 0; i--){
+        	solve(arr, result, i, N - 1);
+            }
+        for (int i = 0; i < N; i++){
+        	printf("%.10lf\n", result[i]);
+            }
+        for (int i = 0; i < N; i++){
+        	free(arr[i]);
+            }
+            free(arr);
+            free(result);
+return 0;
+}
