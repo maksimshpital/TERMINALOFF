@@ -1,0 +1,250 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+void print_matrix(double** x,  int n, int m){
+    for (int i = 0; i < m; ++i){
+        for (int j = 0; j < n; ++j){
+            printf("%lf ",x[i][j]);
+        }
+    }
+}
+void print_vector(int* b, int n){
+    for (int i = 0; i< n; ++i){
+        printf("%d ", b[i]);
+    }
+}
+void print_result(double** a, int* b, int n, int m){
+    print_matrix(a, n, m);
+    printf("\n");
+    print_vector(b, n);
+}
+
+double* init_double_vector(int len){
+    double* vector = (double *)malloc(len * sizeof(double ));
+    for (int i = 0; i < len; ++i) {
+        vector[i] = 0;
+    }
+
+    return vector;
+}
+int* init_int_vector(int len){
+    int* vector = (int*)malloc(len * sizeof(int));
+    for (int i = 0; i < len; ++i) {
+        vector[i] = 0;
+    }
+
+    return vector;
+}
+void free_memory(double **a, int* b, double  *ix, int m){
+    for (int i = 0; i < m; ++i){
+        free(a[i]);
+    }
+    free(a);
+    free(b);
+    free(ix);
+}
+
+double **read_matrix(int n, int m){
+    double **matrix = (double**)malloc(m * sizeof(double*));
+    for (int i = 0; i < m; ++i){
+        matrix[i] = (double*)malloc(n * sizeof(double));
+    }
+
+    for (int i = 0; i < m; ++i){
+        for (int j = 0; j < n; ++j){
+            scanf("%lf", &matrix[i][j]);
+        }
+    }
+
+    return matrix;
+}
+
+//transposition
+void rearrangement(double **a, int m, int n){
+    for (int i = 0; i < m; ++i){
+        for (int j = i; j < m; ++j){
+            if ((a[j][i] != null) && (j != i)){
+
+                for (int k = 0; k < n; ++k)
+                {
+                    double tmp = a[j][k];
+                    a[j][k] = a[i][k];
+                    a[i][k] = tmp;
+                }
+                break;
+            }
+            if ((a[j][i] != null)&&(j == i)) break;
+        }
+    }
+}
+//we bring to a stepwise view, it is necessary to check the correctness of the translation
+void convert_to_stepped_view(double** a, int m, int n){
+    double x = 0;
+    //we bring to a stepped form
+    if (m <= n){
+        for (int i=0; i < m; i++){
+            if (a[i][i] != null){
+                for (int j = i + 1; j < m;j++){
+                    x=a[j][i]/a[i][i];
+                    for (int l = 0; l < n; l++){
+                        a[j][l]=a[j][l]-x*a[i][l];
+                    }
+                }
+            }
+        }
+        for (int i = m - 1; i > 0; i--){
+            if (a[i][i] != null){
+                for (int j = i - 1; j >= 0; j--){
+                    x = a[j][i] / a[i][i];
+                    for (int l = 0; l < n; l++){
+                        a[j][l]=a[j][l]-x*a[i][l];
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < m; ++i){
+            if (a[i][i] != null){
+
+                for (int j = i + 1; j < m; ++j){
+                    x = a[j][i] / a[i][i];
+                    for (int l = 0; l < n; ++l){
+                        a[j][l] = a[j][l] - x * a[i][l];
+                    }
+                }
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < n; ++i){
+            if (a[i][i] != null){
+                for (int j= i + 1; j < m; ++j){
+                    x = a[j][i] / a[i][i];
+                    for (int l = i; l < n; ++l){
+                        a[j][l] = a[j][l]- x * a[i][l];
+                    }
+                }
+            }
+        }
+        for (int i = n - 1; i > 0; ++i){
+            if (a[i][i] != null){
+                for (int j = i - 1; j >= 0; ++j){
+                    x =a[j][i] / a[i][i];
+                    for (int l = 0; l < n; ++l){
+                        a[j][l] = a[j][l]- x * a[i][l];
+                    }
+                }
+            }
+        }
+        for (int i = 0; i<n; ++i){
+            if (a[i][i] != null){
+                for (int j = i + 1; j < m; ++j){
+                    x= a[j][i] / a[i][i];
+                    for (int l = i; l < n; ++l){
+                        a[j][l] = a[j][l] - x * a[i][l];
+                    }
+                }
+            }
+        }
+    }
+}
+//zero lines to the end
+void move_null_string_to_end(double **a, int m, int n){
+    int countNotNullStrings = 0;
+    for (int i = 0; i < m; ++i){
+        for (int j = 0; j < n; ++j){
+            if (a[i][j] != null){
+                countNotNullStrings += 1;
+            }
+        }
+        if (countNotNullStrings == 0){
+            for (int h = i; h < m - 1; ++h){
+                for (int k = 0; k < n; ++k){
+                    a[h][k] = a[h+1][k];
+                    a[h + 1][k] = 0;
+                }
+            }
+        }
+        countNotNullStrings = 0;
+    }
+}
+//looking for the bottom non-zero row
+int find_not_null_string(double **a, int m, int n){
+    int notNullStringIndex = 0;
+    for (int i = m - 1; i >= 0; --i){
+        for (int j = 0; j < n; ++j){
+            if (a[i][j] != null){
+                notNullStringIndex = i;
+                break;
+            }
+        }
+        if (notNullStringIndex != 0) break;
+    }
+    return notNullStringIndex;
+}
+//We are looking for the answer, substituting instead of one of the free variables 1
+void find_answer(double** a, double *ix, int* b, int m, int n, int notNullStringIndex){
+    int index = 1;
+    for (int i = 0; i < n; i++){
+        if (b[i] == 0){
+            ix[i] = 1;
+            for (int j = notNullStringIndex; j >= 0; j--){
+                for (int l = 0; l < n; l++){
+                    if (a[j][l] != null){
+
+                        for (int h = l + 1; h < n; h++){
+                            ix[l] += ix[h]*a[j][h]*(-1);
+                        }
+                        ix[l] = ix[l] / a[j][l];
+                    }
+                    if (a[j][l] != null) break;
+                }
+            }
+            printf("%d) ",index);
+            index += 1;
+            for (int k = 0; k < n; ++k){
+                printf("%lf ",ix[k]);
+            }
+            printf("\n");
+            for (int q = 0; q < n; ++q) ix[q] = 0;
+        }
+    }
+}
+
+void solve(double **a, int *b, double *ix, int m, int n){
+    rearrangement(a, m, n);
+    convert_to_stepped_view(a, m, n);
+    move_null_string_to_end(a, m, n);
+    int notNullStringIndex = find_not_null_string(a, m, n);
+    int sum = 0;
+    //looking for dependent variables
+    for (int i = notNullStringIndex; i >= 0; --i){
+        for (int j = 0; j < n; ++j){
+            if (a[i][j] != null){
+                b[j] += 1;
+                sum += 1;
+                break;
+            }
+        }
+    }
+    printf("Fundamental system of solutions\n");
+    if (sum == n){
+        printf("1) ");
+        for (int i = 0; i < n; ++i){
+            printf("%lf ",0);
+        }
+        return;
+    }
+    find_answer(a, ix, b, m, n, notNullStringIndex);
+}
+int main(){
+    int m, n;
+    scanf("%d %d", &m, &n);
+    double **a = read_matrix(n, m);
+    int *b = init_int_vector(n);
+    double *ix = init_double_vector(n);
+    solve(a, b, ix, m, n);
+    print_result(a, b, n, m);
+    free_memory(a, b, ix, m);
+    return EXIT_SUCCESS;
+}
